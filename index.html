@@ -86,19 +86,27 @@
                     </p>
                 </div>
             </section>
+            
             <section>
                 <h2>Recent News</h2>
-                <ul>
-                    <li>[2025.02] FlexGS is accepted by CVPR 2025. Thanks to all the co-authors! </li>
-                    <li>[2025.01] Hide-In-Motion is accepted by ICRA 2025. Thanks to all the co-authors! </li>
+                <ul id="news-list">
+                    <li>[2025.02] FlexGS is accepted by CVPR 2025. Thanks to all the co-authors!</li>
+                    <li>[2025.01] Hide-In-Motion is accepted by ICRA 2025. Thanks to all the co-authors!</li>
+                    <li class="hidden-news" style="display:none;">[2025.01] InstantSplamp is accepted by ICLR 2025. Thanks to all the co-authors!</li>
+                    <li class="hidden-news" style="display:none;">[2024.12] ConcealGS is accepted by ICASSP 2025. Congratulations to Yifeng!</li>
                 </ul>    
-                
-                <div class="styles_showMore__JvZFs"><button>Show More</button></div>
-                <ul>
-                    <li>[2025.01] InstantSplamp is accepted by ICLR 2025. Thanks to all the co-authors! </li>
-                    <li>[2024.12] ConcealGS is accepted by ICASSP 2025. Congratulations to Yifeng! </li>
-                </ul>
+                <button id="show-more-btn">Show More</button>
             </section>
+            
+            <script>
+            document.getElementById('show-more-btn').addEventListener('click', function() {
+                const hiddenItems = document.querySelectorAll('.hidden-news');
+                hiddenItems.forEach(item => {
+                    item.style.display = 'list-item';
+                });
+                this.style.display = 'none'; 
+            });
+            </script>
             
             <section>
                 <h2>Selected Publications</h2>
