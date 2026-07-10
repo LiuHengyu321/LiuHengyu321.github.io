@@ -1,1 +1,693 @@
+<!DOCTYPE html>
+<!-- <!DOCTYPE html>
+<html lang="en">
 
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Hengyu Liu's Homepage</title>
+   <link rel="shortcut icon" href="./pic/cover.ico" type="image/x-icon">
+   
+   <!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* --- Global Variables & Reset --- */
+:root {
+--primary-color: #2c3e50;
+--accent-color: #0066cc;
+--accent-hover: #004499;
+--text-color: #333;
+--light-text: #666;
+--bg-color: #f9f9f9;
+--container-bg: #ffffff;
+--border-color: #eaeaea;
+--spacing-unit: 20px;
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+body {
+font-family: 'Lato', 'Roboto', sans-serif;
+background-color: var(--bg-color);
+color: var(--text-color);
+line-height: 1.6;
+font-size: 16px;
+}
+
+a {
+color: var(--accent-color);
+text-decoration: none;
+transition: color 0.2s ease;
+}
+
+a:hover {
+color: var(--accent-hover);
+text-decoration: underline;
+}
+
+/* --- Layout Container --- */
+.container {
+max-width: 960px;
+margin: 40px auto;
+background-color: var(--container-bg);
+padding: 40px 60px;
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+border-radius: 8px;
+}
+
+section {
+margin-bottom: 40px;
+border-bottom: 1px solid var(--border-color);
+padding-bottom: 30px;
+}
+
+section:last-of-type {
+border-bottom: none;
+}
+
+h1, h2, h3 {
+color: var(--primary-color);
+margin-bottom: 15px;
+}
+
+h1 { font-size: 2.2rem; font-weight: 700; }
+h2 { font-size: 1.5rem; border-left: 4px solid var(--accent-color); padding-left: 12px; margin-bottom: 20px; }
+h3 { font-size: 1.1rem; font-weight: 600; }
+
+/* --- Profile Section --- */
+.profile-section {
+display: flex;           /* 使用弹性布局让图片和文字并排 */
+align-items: center;     /* 垂直居中对齐 */
+max-width: 1000px;        /* 限制最大宽度 */
+margin: 0 auto;          /* 居中显示 */
+padding: 40px 0;
+
+/* 【关键修改 1】文字整体向右移动 */
+/* 增加 gap 的数值，可以让文字离图片更远，从而视觉上向右移 */
+gap: 17%; 
+}
+
+.profile-img {
+width: 210px;            /* 头像宽度 */
+height: 210px;           /* 头像高度 */
+
+object-fit: cover;       /* 防止图片变形 */
+box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* 轻微阴影 */
+flex-shrink: 0;          /* 防止头像被压缩 */
+margin-left: 7%; /* 你可以调整这个值 */
+}
+
+/* --- 文字信息容器 --- */
+.profile-info {
+text-align: left;
+}
+
+.profile-info h1 {
+font-size: 38px;
+font-weight: 700;
+color: #2c3e50;
+
+/* 名字下方的间距 */
+margin: 0 0 15px 0; 
+line-height: 1.2;
+}
+
+/* --- 详细信息 (H3) --- */
+/* 【关键修改 2】行间距变小 */
+.profile-info h3 {
+font-size: 20px;
+font-weight: 400; /* 去掉加粗，让它看起来更像正文 */
+color: #444;
+
+/* 这里控制行间距：上下边距设得很小 */
+margin: 0 0 6px 0; 
+line-height: 1.4;
+}
+
+/* --- 链接区域 --- */
+.profile-links {
+margin-top: 20px; /* 链接与上方文字的距离 */
+}
+
+.profile-links a {
+color: #0066cc;
+text-decoration: none;
+margin-right: 15px; /* 链接之间的间距 */
+font-weight: 500;
+font-size: 16px;
+}
+
+.profile-links a:hover {
+text-decoration: underline;
+}
+
+/* 手机端适配：屏幕变窄时自动改为上下排列 */
+@media (max-width: 768px) {
+.profile-section {
+flex-direction: column;
+text-align: center;
+gap: 20px;
+}
+.profile-info {
+text-align: center;
+}
+}
+
+/* --- News Section --- */
+ul { padding-left: 20px; }
+li { margin-bottom: 8px; }
+
+.news-list li {
+list-style-type: none;
+position: relative;
+padding-left: 20px;
+}
+.news-list li::before {
+content: "•";
+color: var(--accent-color);
+font-weight: bold;
+position: absolute;
+left: 0;
+}
+
+.hidden-news { display: none; }
+
+button#show-more-btn {
+background-color: transparent;
+border: 1px solid var(--accent-color);
+color: var(--accent-color);
+padding: 6px 12px;
+border-radius: 4px;
+cursor: pointer;
+font-size: 0.9rem;
+margin-top: 10px;
+transition: all 0.2s;
+}
+
+button#show-more-btn:hover {
+background-color: var(--accent-color);
+color: #fff;
+}
+
+/* --- Publications Section --- */
+.pub-note {
+font-size: 0.9rem;
+color: var(--light-text);
+margin-bottom: 20px;
+font-style: italic;
+}
+
+.pub-item {
+display: flex;
+gap: 25px;
+margin-bottom: 30px;
+align-items: flex-start;
+}
+
+.pub-img-container {
+flex-shrink: 0;
+width: 220px;
+}
+
+.pub-img-container img {
+width: 100%;
+border-radius: 6px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+transition: transform 0.2s;
+}
+
+.pub-img-container img:hover {
+transform: scale(1.02);
+}
+
+.pub-content {
+flex-grow: 1;
+}
+
+.pub-title {
+font-size: 1.1rem;
+font-weight: 700;
+color: var(--primary-color);
+margin-bottom: 6px;
+}
+
+.pub-venue {
+font-style: italic;
+color: var(--light-text);
+margin-bottom: 8px;
+}
+
+.pub-links a {
+margin-right: 12px;
+font-size: 0.95rem;
+display: inline-block;
+}
+
+/* --- Education Section --- */
+.edu-item {
+display: flex;
+gap: 20px;
+margin-bottom: 25px;
+align-items: center;
+}
+
+.edu-logo {
+width: 80px;
+flex-shrink: 0;
+text-align: center;
+}
+
+.edu-logo img {
+max-width: 100%;
+max-height: 80px;
+}
+
+.edu-info div { margin-bottom: 2px; }
+.edu-school { font-weight: 700; font-size: 1.1rem; }
+
+/* --- Footer --- */
+footer {
+text-align: center;
+font-size: 0.85rem;
+color: #888;
+margin-top: 60px;
+padding-top: 20px;
+border-top: 1px solid #eee;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+.container {
+margin: 0;
+padding: 20px;
+width: 100%;
+border-radius: 0;
+box-shadow: none;
+}
+
+.profile-section {
+flex-direction: column;
+text-align: center;
+gap: 20px;
+}
+
+.profile-links {
+justify-content: center;
+}
+
+.pub-item {
+flex-direction: column;
+}
+
+.pub-img-container {
+width: 100%;
+max-width: 300px;
+margin-bottom: 10px;
+}
+
+.edu-item {
+flex-direction: column;
+text-align: center;
+}
+}
+
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+line-height: 1.6;
+color: #333;
+max-width: 1000px;
+margin: 0 auto;
+padding: 20px;
+}
+
+/* 单个发表物项目的布局容器 */
+.pub-item {
+display: flex;          /* 启用弹性布局，让视频和文字并排 */
+gap: 25px;              /* 视频和文字之间的间距 */
+margin-bottom: 40px;    /* 每个项目之间的垂直间距 */
+align-items: flex-start; /* 顶部对齐 */
+}
+
+/* 视频容器：统一控制长宽 */
+.pub-img-container {
+flex: 0 0 320px;        /* 【关键】固定宽度 320px，不随页面缩放 */
+height: 180px;          /* 【关键】固定高度 180px，确保上下一致 */
+
+background-color: #000; /* 背景色，防止视频加载前留白 */
+border-radius: 8px;     /* 圆角 */
+box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* 阴影效果 */
+overflow: hidden;       /* 超出圆角的部分隐藏 */
+position: relative;
+}
+
+/* 视频本身的样式 */
+.pub-img-container video {
+width: 100%;            /* 撑满容器宽度 */
+height: 100%;           /* 撑满容器高度 */
+object-fit: cover;      /* 【核心】保持比例填充，多余部分自动裁剪，不拉伸变形 */
+display: block;
+}
+
+/* 右侧文字内容区域 */
+.pub-content {
+flex: 1;                /* 占据剩余的所有宽度 */
+display: flex;
+flex-direction: column;
+justify-content: center; /* 让文字块在垂直方向稍微居中一点，或者用 flex-start 靠上 */
+min-height: 180px;       /* 最小高度与视频一致，保证排版整齐 */
+}
+
+.pub-title {
+font-size: 18px;
+font-weight: 700;
+margin-bottom: 8px;
+color: #222;
+}
+
+.pub-authors a {
+color: #555;
+text-decoration: none;
+/* border-bottom: 1px solid #ccc; */
+
+/* 强制去除右边距和内边距，防止句号分离 */
+margin: 0 !important;
+padding: 0 !important;
+display: inline; 
+}
+
+.pub-venue {
+font-style: italic;
+color: #666;
+margin-bottom: 8px;
+}
+
+.pub-content a {
+color: #0066cc;
+text-decoration: none;
+margin-right: 5px;
+}
+
+.pub-content a:hover {
+text-decoration: underline;
+}
+
+/* 移动端适配：屏幕变窄时改为上下排列 */
+@media (max-width: 768px) {
+.pub-item {
+flex-direction: column;
+}
+.pub-img-container {
+width: 100%;
+flex: none;
+height: auto;
+aspect-ratio: 16/9; /* 移动端保持16:9比例 */
+}
+.pub-content {
+min-height: auto;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<!-- Profile Section -->
+<section class="profile-section">
+<img class="profile-img" src="./pic/3.jpg" alt="Hengyu Liu" onerror="this.src='https://via.placeholder.com/180?text=Avatar'">
+<div class="profile-info">
+<h1>Hengyu Liu</h1>
+<!-- <h3 class="profile-chinese-name">刘恒宇</h3> -->
+<h3>Incoming Ph.D. Student</h3>
+<h3>University of Texas at Austin</h3>
+<h3></h3>
+<div class="profile-links">
+<a href="mailto:hy.liu321@utexas.edu">Email</a>
+<a href="https://scholar.google.com/citations?user=UiejE-oAAAAJ&hl=en">Google Scholar</a>
+<!-- <a href="#">CV</a> -->
+<a href="https://github.com/LiuHengyu321">Github</a>
+</div>
+</div>
+</section>
+
+<!-- About Section -->
+<section>
+<h2>About Me</h2>
+<p>
+I am an incoming Ph.D. student at the <a href="https://www.utexas.edu/"> University of Texas at Austin</a>.
+I did my M.Phil. at the <a href="https://www.ee.cuhk.edu.hk/en-gb/">The Chinese University of Hong Kong</a> and received my B.E. at <a href="https://www.tju.edu.cn/">Tianjin University</a>, 
+where I had the honor to work closely with Prof. <a href="http://cic.tju.edu.cn/faculty/zhangchangqing/research.html">Changqing Zhang</a>.
+I'm currently focusing on 3D Computer Vision and its application in video worlding and VLM agents.
+</p>
+<!-- <br> -->
+<!-- <p>
+               I'm currently focusing on 3D Computer Vision and its interaction with Video World Model.
+           </p> -->
+</section>
+
+<!-- News Section -->
+<section>
+<h2>Recent News</h2>
+<ul class="news-list" id="news-list">
+<li><strong>[2026.04]</strong> I pass my M.Phil. Oral Defense!</li>
+<li><strong>[2025.09]</strong> IR3D-Bench is accepted by NeurIPS 2025.</li>
+<li><strong>[2025.02]</strong> FlexGS is accepted by CVPR 2025.</li>
+<!-- <li><strong>[2025.01]</strong> Hide-In-Motion is accepted by ICRA 2025.</li> -->
+<!-- <li><strong>[2025.01]</strong> InstantSplamp is accepted by ICLR 2025.</li> -->
+<!-- <li><strong>[2024.07]</strong> LGS, Endora is accepted by MICCAI 2024.</li> -->
+</ul>
+</section>
+
+<!-- Publications Section -->
+<section>
+<h2>Selected Publications</h2>
+<!-- My research currently focusing on Vision-Language Model and 3D Computer Vision. Below are my publications. -->
+<div class="pub-note"><sup>*</sup> denotes equal contribution;</div>
+<div class="pub-item">
+<div class="pub-img-container">
+<video autoplay loop muted playsinline>
+<source src="https://ir3d-bench.github.io/static/img/ir3d-demo1.webm" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+<div class="pub-content">
+<div class="pub-title">IR3D-Bench: Evaluating Vision-Language Model Scene Understanding as Agentic Inverse Rendering</div>
+<div class="pub-authors">
+<u>Hengyu Liu</u><sup>*</sup>, 
+<a href="https://chenxinli001.github.io/">Chenxin Li</a><sup>*</sup>,
+<a href="https://github.com/Lizx123456">Zhengxin Li</a>,
+<a href="https://github.com/Lizx123456">Zhengxin Li</a>,
+<a href="https://github.com/wind-bell999">Yipeng Wu</a>, <br>
+<a href="https://wymancv.github.io/wuyang.github.io/">Wuyang Li</a>,
+<a href="https://visitworld123.github.io/">Zhiqin Yang</a>,
+<a href="https://openreview.net/profile?id=~Zhenyuan_Zhang2">Zhenyuan Zhang</a>,
+<a href="https://lyl1015.github.io/">Yunlong Lin</a>,
+<a href="https://facultyprofiles.hkust.edu.hk/profiles.php?profile=sirui-han-siruihan">Sirui Han</a>,
+<a href="https://brandonyfeng.github.io/">Brandon Y. Feng</a>.
+</div>
+<div class="pub-venue">NeurIPS 2025</div>
+<div>
+<a href="https://arxiv.org/abs/2506.23329">Paper</a>/
+<a href="https://ir3d-bench.github.io/">Project</a>/
+<a href="https://github.com/LiuHengyu321/IR3D-Bench">Code</a>/
+<a href="https://youtu.be/tuFEgTn0gnM">YouTube</a>/
+<a href="https://huggingface.co/datasets/Piang/IR3D-bench">Huggingface</a>
+</div>
+</div>
+</div>
+
+<!-- Item 2 -->
+<div class="pub-item">
+<div class="pub-img-container">
+<video autoplay loop muted playsinline>
+<source src="https://flexgs.github.io/media/demo_video_updated.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+<div class="pub-content">
+<div class="pub-title">FlexGS: Train Once, Deploy Everywhere with Many-in-One Flexible 3D Gaussian Splatting</div>
+<div class="pub-authors">
+<u>Hengyu Liu</u><sup>*</sup>, 
+<a href="https://yuehaolab.com/">Yuehao Wang</a><sup>*</sup>, 
+<a href="https://chenxinli001.github.io/">Chenxin Li</a><sup>*</sup>, 
+<a href="https://cairuisi.github.io/">Ruisi Cai</a>,
+<a href="https://www.kevin-ai.com/">Kevin Wang</a>,
+<a href="https://wymancv.github.io/wuyang.github.io/">Wuyang Li</a>,
+<a href="https://www.pmolchanov.com/">Pavlo Molchanov</a>,
+<a href="https://peihaowang.github.io/">Peihao Wang</a>,
+<a href="https://www.ece.utexas.edu/people/faculty/atlas-wang">Zhangyang Wang</a>.
+</div>
+<div class="pub-venue">CVPR 2025</div>
+<div>
+<a href="https://arxiv.org/abs/2506.04174">Paper</a>/
+<a href="https://flexgs.github.io/">Project</a>/
+<a href="https://github.com/LiuHengyu321/FlexGS">Code</a>/
+<a href="https://www.youtube.com/watch?v=k6aDJUfxs4Q">YouTube</a>/
+<a href="https://www.bilibili.com/video/BV1tMKwz7E5h/?spm_id_from=333.337.search-card.all.click&vd_source=93eefe5f49ec3d245c36a0e355fd2183">Bilibili</a>
+</div>
+</div>
+</div>
+
+<!-- Paper 2 -->
+<!-- <div class="pub-item">
+               <div class="pub-img-container">
+                   <img src="./paper_img/instantsplamp.png" alt="InstantSplamp" onerror="this.src='https://via.placeholder.com/300x180?text=InstantSplamp'">
+               </div>
+               <div class="pub-content">
+                   <div class="pub-title">InstantSplamp: Fast and Generalizable Stenography Framework for Generative Gaussian Splatting</div>
+                   <div class="pub-authors">
+                       Chenxin Li<sup>*</sup>, <strong>Hengyu Liu<sup>*</sup></strong>, Zhiwen Fan, Wuyang Li, Yifan Liu, Panwang Pan, Yixuan Yuan.
+                   </div>
+                   <div class="pub-venue">ICLR 2025</div>
+                   <div class="pub-links">
+                       <a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/1e1cf05517b959c1ce5934734efc421b-Abstract-Conference.html">[Paper]</a>
+                       <a href="https://gaussian-stego.github.io/">[Project]</a>
+                       <a href="https://github.com/CUHK-AIM-Group/InstantSplamp">[Code]</a>
+                   </div>
+               </div>
+           </div> -->
+
+<!-- Paper 3 -->
+<!-- <div class="pub-item">
+               <div class="pub-img-container">
+                   <img src="./paper_img/hide-in-motion.jpg" alt="Hide-in-Motion" onerror="this.src='https://via.placeholder.com/300x180?text=Hide-in-Motion'">
+               </div>
+               <div class="pub-content">
+                   <div class="pub-title">Hide-in-Motion: Embedding Steganographic Copyright Information into 4D Gaussian Splatting Assets</div>
+                   <div class="pub-authors">
+                       <strong>Hengyu Liu<sup>*</sup></strong>, Chenxin Li<sup>*</sup>, Wentao Pan, Zhiqin Yang, Yifeng Yang, Yifan Liu, Wuyang Li, Yixuan Yuan.
+                   </div>
+                   <div class="pub-venue">ICRA 2025</div>
+                   <div class="pub-links">
+                       <a href="https://ieeexplore.ieee.org/abstract/document/11128285">[Paper]</a>
+                   </div>
+               </div>
+           </div> -->
+
+<!-- Paper 4 -->
+<!-- <div class="pub-item">
+               <div class="pub-img-container">
+                   <img src="./paper_img/lgs.png" alt="LGS" onerror="this.src='https://via.placeholder.com/300x180?text=LGS'">
+               </div>
+               <div class="pub-content">
+                   <div class="pub-title">LGS: A Light-weight 4D Gaussian Splatting for Efficient Surgical Scene Reconstruction</div>
+                   <div class="pub-authors">
+                       <strong>Hengyu Liu<sup>*</sup></strong>, Yifan Liu<sup>*</sup>, Chenxin Li<sup>*</sup>, Wuyang Li, Yixuan Yuan.
+                   </div>
+                   <div class="pub-venue">MICCAI 2024</div>
+                   <div class="pub-links">
+                       <a href="https://arxiv.org/abs/2406.16073">[Paper]</a>
+                       <a href="https://lgs-endo.github.io/">[Project]</a>
+                       <a href="https://github.com/CUHK-AIM-Group/LGS">[Code]</a>
+                   </div>
+               </div>
+           </div> -->
+
+</section>
+
+<!-- Education Section -->
+<section>
+<h2>Education</h2>
+
+<div class="edu-item">
+<div class="edu-logo">
+<img src="./pic/ut_logo.png" alt="UT" onerror="this.src='https://via.placeholder.com/80?text=CUHK'">
+</div>
+<div class="edu-info">
+<div class="edu-school">University of Texas at Austin</div>
+<div>Ph.D. Student</div>
+<div style="color: #666; font-size: 0.9rem;">Aug. 2026 - </div>
+</div>
+</div>
+
+<div class="edu-item">
+<div class="edu-logo">
+<img src="./pic/cuhk_logo.png" alt="CUHK" onerror="this.src='https://via.placeholder.com/80?text=CUHK'">
+</div>
+<div class="edu-info">
+<div class="edu-school">The Chinese University of Hong Kong</div>
+<div>M.Phil. in Electronic Engineering</div>
+<div style="color: #666; font-size: 0.9rem;">Sep. 2024 - Jul. 2026</div>
+</div>
+</div>
+
+<div class="edu-item">
+<div class="edu-logo">
+<img src="./pic/TJU_logo.png" alt="TJU" onerror="this.src='https://via.placeholder.com/80?text=TJU'">
+</div>
+<div class="edu-info">
+<div class="edu-school">Tianjin University</div>
+<div>B.E. in Artificial Intelligence</div>
+<!-- <div>B.E. </div> -->
+<div style="color: #666; font-size: 0.9rem;">Sep. 2020 - Jul. 2024</div>
+<div style="font-size: 0.9rem;">GPA: 3.93/4.00, Ranking: 1/69</div>
+</div>
+</div>
+</section>
+
+<!-- Awards Section -->
+<section>
+<h2>Awards</h2>
+<ul>
+<li>ICML 2026 Gold Reviewer, 2026.</li>
+<li>NeurIPS 2025 Scholar Award, 2025.</li>
+<li>Outstanding Undergraduate Thesis of Tianjin University, 2024.</li>
+<li>Outstanding Graduates of Tianjin University, 2024.</li>
+<li>Outstanding Student of Tianjin University, 2022.</li>
+</ul>
+</section>
+
+<!-- Services Section -->
+<section>
+<h2>Services</h2>
+<h3>Conference Reviewer</h3>
+<ul>
+<li>ICLR 2026, ICML 2026, CVPR 2025, AAAI 2025-2026, ICASSP 2025-2026, IJCNN 2025-2026.</li>
+</ul>
+<h3>Journal Reviewer</h3>
+<ul>
+<li>Pattern Recognition.</li>
+</ul>
+<h3>Teaching Assistant</h3>
+<ul>
+<li>ELEG2310B, CUHK, 2024-2025 Fall;</li>
+<li>ENGG1130, CUHK, 2024-2025 Spring;</li>
+</ul>
+
+
+<div style="margin-top: 20px;">
+<script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=IkOFG16vHZE12ExtgOnXo1JCutw8o4DHsDARY-SW9b4&cl=ffffff&w=a"></script>
+</div>
+</section>
+
+<!-- Footer -->
+<footer>
+<p>Last updated on <time datetime="2025-11-26">Nov 26, 2025</time></p>
+<p>Template adapted from <a href="https://www.xzhou.me/">here</a>.</p>
+</footer>
+</div>
+
+<script>
+// Logic for "Show More" button in News section
+document.getElementById('show-more-btn').addEventListener('click', function() {
+const hiddenItems = document.querySelectorAll('.hidden-news');
+hiddenItems.forEach(item => {
+item.style.display = 'list-item';
+// Optional: add a small fade-in effect
+item.style.opacity = 0;
+setTimeout(() => item.style.opacity = 1, 50);
+item.style.transition = 'opacity 0.5s';
+});
+this.style.display = 'none'; 
+});
+</script>
+</body>
+</html>
+</html> -->
