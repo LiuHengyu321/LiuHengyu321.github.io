@@ -1139,7 +1139,7 @@
         return {
           randomizedTaskIndex: randomizedTaskIndex + 1,
           caseId,
-          trajectory: caseId.replace(/^DL_\\d+_\\d+_/, ""),
+          trajectory: caseId.replace(/^DL_\d+_\d+_/, ""),
           assignedMetricId,
           displayOrder: displayOrder.map((candidateId, index) => ({
             label: String.fromCharCode(65 + index),
