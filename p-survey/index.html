@@ -374,6 +374,10 @@
       gap: 8px;
     }
 
+    .metric-tabs.single {
+      grid-template-columns: 1fr;
+    }
+
     .metric-tab {
       position: relative;
       min-height: 92px;
@@ -535,7 +539,7 @@
       <p class="eyebrow" data-i18n="introEyebrow">匿名视频对比实验</p>
       <h1 data-i18n="introTitle">选出每组中表现更好的两个视频</h1>
       <p class="lede" data-i18n="introLede">
-        本实验共 15 组，每组包含由同一输入生成的 4 个匿名视频。请完整观看循环播放的视频，并按四项指标分别选出表现最好的两个。
+        本实验共 15 组，每组包含由同一输入生成的 4 个匿名视频。每组会给出一项评价指标，请完整观看循环播放的视频并选出表现最好的两个。
       </p>
 
       <div class="instruction-grid">
@@ -544,8 +548,8 @@
           <span data-i18n="step1Text">四个视频共享同一场景与相机轨迹；不要根据编号猜测方法。</span>
         </div>
         <div class="instruction">
-          <strong data-i18n="step2Title">2. 每项恰选两个</strong>
-          <span data-i18n="step2Text">依次评价四项指标。不同指标可以选择不同的视频。</span>
+          <strong data-i18n="step2Title">2. 每组恰选两个</strong>
+          <span data-i18n="step2Text">每组只评价页面给出的一项指标，从四个视频中选择两个。</span>
         </div>
         <div class="instruction">
           <strong data-i18n="step3Title">3. 可同步重播</strong>
@@ -626,8 +630,8 @@
   <script>
     "use strict";
 
-    const STUDY_VERSION = "p-survey-v1.1";
-    const STORAGE_KEY = "p_survey_draft_v1";
+    const STUDY_VERSION = "p-survey-v1.2";
+    const STORAGE_KEY = "p_survey_draft_v2";
     const CANDIDATES = ["candidate-a", "candidate-b", "candidate-c", "candidate-d"];
     const CASES = [
       "DL_058_4_forward_backward",
@@ -682,9 +686,9 @@
       zh: {
         introEyebrow: "匿名视频对比实验",
         introTitle: "选出每组中表现更好的两个视频",
-        introLede: "本实验共 15 组，每组包含由同一输入生成的 4 个匿名视频。请完整观看循环播放的视频，并按四项指标分别选出表现最好的两个。",
+        introLede: "本实验共 15 组，每组包含由同一输入生成的 4 个匿名视频。每组会给出一项评价指标，请完整观看循环播放的视频并选出表现最好的两个。",
         step1Title: "1. 同组公平比较", step1Text: "四个视频共享同一场景与相机轨迹；不要根据编号猜测视频来源。",
-        step2Title: "2. 每项恰选两个", step2Text: "依次评价四项指标。不同指标可以选择不同的视频。",
+        step2Title: "2. 每组恰选两个", step2Text: "每组只评价页面给出的一项指标，从四个视频中选择两个。",
         step3Title: "3. 可同步重播", step3Text: "视频静音、自动循环播放。可使用同步重播按钮对齐起点。",
         step4Title: "4. 下载并发送结果", step4Text: "完成后下载 JSON 文件，并将该文件发送给研究人员。",
         participantLabel: "参与者编号（由研究人员提供；没有可留空）",
@@ -700,16 +704,16 @@
         scene: "场景", sceneSubtitle: "请观察完整循环，再根据下方当前指标选择两个视频。",
         task: "场景", selected: "已选", choose: "选择视频",
         chosen: "已选择", metric: "指标", incompleteMetric: "请先为当前指标恰好选择两个视频。",
-        incompleteTask: "本组仍有指标未完成，请完成四项选择后继续。",
+        incompleteTask: "请按本组指标恰好选择两个视频后继续。",
         draftSaved: "草稿已保存到此浏览器。", resume: "检测到未完成草稿，已自动恢复。",
         noId: "anonymous", invalidDraft: "草稿无法读取，已开始新的实验。"
       },
       en: {
         introEyebrow: "Anonymous video comparison",
         introTitle: "Choose the two better videos in each group",
-        introLede: "This study contains 15 groups. Each group shows four anonymous videos generated from the same input. Watch the looping videos and choose the best two separately for each of four criteria.",
+        introLede: "This study contains 15 groups. Each group shows four anonymous videos generated from the same input and one evaluation criterion. Watch the complete loop and choose the best two.",
         step1Title: "1. Compare within each group", step1Text: "All four videos share the same scene and camera trajectory. Do not infer their sources from labels.",
-        step2Title: "2. Choose exactly two", step2Text: "Evaluate all four criteria in order. Your choices may differ by criterion.",
+        step2Title: "2. Choose exactly two", step2Text: "Each group has one criterion. Choose two of the four videos for that criterion.",
         step3Title: "3. Replay in sync", step3Text: "Videos are muted and loop automatically. Use synchronized replay to align their starting points.",
         step4Title: "4. Download and send", step4Text: "Download the JSON file after completion and send it to the researcher.",
         participantLabel: "Participant ID (provided by the researcher; optional)",
@@ -725,7 +729,7 @@
         scene: "Scene", sceneSubtitle: "Watch a complete loop, then choose two videos for the current criterion below.",
         task: "Scene", selected: "Selected", choose: "Select video",
         chosen: "Selected", metric: "Criterion", incompleteMetric: "Please choose exactly two videos for the current criterion.",
-        incompleteTask: "Some criteria in this group are incomplete. Complete all four before continuing.",
+        incompleteTask: "Choose exactly two videos for this group's criterion before continuing.",
         draftSaved: "Draft saved in this browser.", resume: "An unfinished draft was found and restored.",
         noId: "anonymous", invalidDraft: "The draft could not be read. A new study was started."
       }
@@ -760,12 +764,18 @@
 
     function createState(participantId) {
       const taskOrder = shuffle(CASES);
+      const balancedMetricIds = shuffle(METRICS.map(metric => metric.id));
+      const metricPool = shuffle(Array.from(
+        { length: CASES.length },
+        (_, index) => balancedMetricIds[index % balancedMetricIds.length]
+      ));
       const videoOrders = {};
+      const metricAssignments = {};
       const answers = {};
-      for (const caseId of taskOrder) {
+      for (const [index, caseId] of taskOrder.entries()) {
         videoOrders[caseId] = shuffle(CANDIDATES);
-        answers[caseId] = {};
-        for (const metric of METRICS) answers[caseId][metric.id] = [];
+        metricAssignments[caseId] = metricPool[index];
+        answers[caseId] = [];
       }
       return {
         schemaVersion: STUDY_VERSION,
@@ -778,6 +788,7 @@
         language,
         taskOrder,
         videoOrders,
+        metricAssignments,
         answers
       };
     }
@@ -840,17 +851,18 @@
     }
 
     function currentSelections() {
-      return state.answers[currentCaseId()][METRICS[currentMetricIndex].id];
+      return state.answers[currentCaseId()];
     }
 
     function taskComplete(caseId) {
-      return METRICS.every(metric => state.answers[caseId][metric.id].length === 2);
+      return state.answers[caseId].length === 2;
     }
 
     function renderTask() {
       if (!state) return;
       const caseId = currentCaseId();
       const order = state.videoOrders[caseId];
+      currentMetricIndex = METRICS.findIndex(metric => metric.id === state.metricAssignments[caseId]);
       const metric = METRICS[currentMetricIndex];
       const selections = currentSelections();
 
@@ -870,7 +882,7 @@
         return `
           <article class="video-card ${isSelected ? "selected" : ""}" data-candidate="${candidateId}">
             <div class="video-wrap">
-              <video src="${source}" autoplay loop muted playsinline preload="auto"
+              <video src="${source}" autoplay loop muted playsinline preload="metadata"
                 aria-label="Video ${label}" disablepictureinpicture></video>
               <span class="video-label">${label}</span>
             </div>
@@ -887,23 +899,12 @@
         input.addEventListener("change", () => toggleSelection(input.dataset.candidate, input));
       });
 
-      $("metricTabs").innerHTML = METRICS.map((item, index) => {
-        const done = state.answers[caseId][item.id].length === 2;
-        return `
-          <button class="metric-tab ${index === currentMetricIndex ? "active" : ""} ${done ? "done" : ""}"
-            type="button" data-index="${index}" aria-pressed="${index === currentMetricIndex}">
-            <span class="metric-index">${t("metric")} ${index + 1}</span>
-            <span class="metric-name">${language === "zh" ? item.zh : item.en}</span>
-          </button>`;
-      }).join("");
-
-      $("metricTabs").querySelectorAll(".metric-tab").forEach(button => {
-        button.addEventListener("click", () => {
-          currentMetricIndex = Number(button.dataset.index);
-          renderTask();
-          saveDraft();
-        });
-      });
+      $("metricTabs").classList.add("single");
+      $("metricTabs").innerHTML = `
+        <div class="metric-tab active ${selections.length === 2 ? "done" : ""}">
+          <span class="metric-index">${t("metric")}</span>
+          <span class="metric-name">${language === "zh" ? metric.zh : metric.en}</span>
+        </div>`;
 
       $("metricHelp").textContent = language === "zh" ? metric.helpZh : metric.helpEn;
       $("selectionStatus").textContent = `${t("selected")} ${selections.length} / 2`;
@@ -934,22 +935,28 @@
 
       $("errorMessage").textContent = "";
       saveDraft();
-      renderTask();
+      refreshSelectionUI();
+    }
 
-      if (selected.length === 2 && currentMetricIndex < METRICS.length - 1) {
-        window.setTimeout(() => {
-          currentMetricIndex += 1;
-          renderTask();
-          saveDraft();
-        }, 260);
-      }
+    function refreshSelectionUI() {
+      const selected = currentSelections();
+      $("videoGrid").querySelectorAll(".video-card").forEach(card => {
+        const candidateId = card.dataset.candidate;
+        const isSelected = selected.includes(candidateId);
+        const input = card.querySelector("input[type=checkbox]");
+        const label = card.querySelector(".video-label").textContent;
+        card.classList.toggle("selected", isSelected);
+        input.checked = isSelected;
+        card.querySelector(".video-choice span").textContent =
+          `${isSelected ? t("chosen") : t("choose")} ${label}`;
+      });
+      $("selectionStatus").textContent = `${t("selected")} ${selected.length} / 2`;
+      $("metricTabs").querySelector(".metric-tab").classList.toggle("done", selected.length === 2);
     }
 
     function navigateTask(direction) {
       const caseId = currentCaseId();
       if (direction > 0 && !taskComplete(caseId)) {
-        const firstIncomplete = METRICS.findIndex(metric => state.answers[caseId][metric.id].length !== 2);
-        currentMetricIndex = firstIncomplete < 0 ? 0 : firstIncomplete;
         renderTask();
         $("errorMessage").textContent = t("incompleteTask");
         return;
@@ -961,7 +968,6 @@
       }
 
       currentTaskIndex = Math.max(0, Math.min(state.taskOrder.length - 1, currentTaskIndex + direction));
-      currentMetricIndex = 0;
       saveDraft();
       renderTask();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -998,23 +1004,21 @@
         const labelsByCandidate = Object.fromEntries(displayOrder.map((candidateId, index) => [
           candidateId, String.fromCharCode(65 + index)
         ]));
-        const ratings = {};
-        for (const metric of METRICS) {
-          const selectedCandidateIds = state.answers[caseId][metric.id];
-          ratings[metric.id] = {
-            selectedLabels: selectedCandidateIds.map(candidateId => labelsByCandidate[candidateId]).sort(),
-            selectedCandidateIds
-          };
-        }
+        const assignedMetricId = state.metricAssignments[caseId];
+        const selectedCandidateIds = state.answers[caseId];
         return {
           randomizedTaskIndex: randomizedTaskIndex + 1,
           caseId,
           trajectory: caseId.replace(/^DL_\\d+_\\d+_/, ""),
+          assignedMetricId,
           displayOrder: displayOrder.map((candidateId, index) => ({
             label: String.fromCharCode(65 + index),
             candidateId
           })),
-          ratings
+          rating: {
+            selectedLabels: selectedCandidateIds.map(candidateId => labelsByCandidate[candidateId]).sort(),
+            selectedCandidateIds
+          }
         };
       });
 
@@ -1029,7 +1033,8 @@
             labelZh: metric.zh,
             labelEn: metric.en
           })),
-          randomization: "case order and within-case video display order randomized per participant"
+          metricAssignment: "one metric per case, balanced 4/4/4/3 with the three-count metric randomized per participant",
+          randomization: "metric assignment, case order, and within-case video display order randomized per participant"
         },
         participant: {
           id: state.participantId || null,
