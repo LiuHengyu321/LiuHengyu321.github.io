@@ -525,7 +525,7 @@
   <main class="shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">WP</div>
+        <div class="brand-mark" aria-hidden="true">PS</div>
         <span>Video Evaluation Study</span>
       </div>
       <button id="langButton" class="lang-button" type="button" aria-label="Switch language">EN / 中文</button>
@@ -626,9 +626,9 @@
   <script>
     "use strict";
 
-    const STUDY_VERSION = "worldprism-user-study-v1.0";
-    const STORAGE_KEY = "worldprism_user_study_draft_v1";
-    const METHODS = ["ours", "DiffusionAsShader", "worldcompass", "WorldPlay"];
+    const STUDY_VERSION = "p-survey-v1.1";
+    const STORAGE_KEY = "p_survey_draft_v1";
+    const CANDIDATES = ["candidate-a", "candidate-b", "candidate-c", "candidate-d"];
     const CASES = [
       "DL_058_4_forward_backward",
       "DL_026_4_forward_backward",
@@ -683,7 +683,7 @@
         introEyebrow: "匿名视频对比实验",
         introTitle: "选出每组中表现更好的两个视频",
         introLede: "本实验共 15 组，每组包含由同一输入生成的 4 个匿名视频。请完整观看循环播放的视频，并按四项指标分别选出表现最好的两个。",
-        step1Title: "1. 同组公平比较", step1Text: "四个视频共享同一场景与相机轨迹；不要根据编号猜测方法。",
+        step1Title: "1. 同组公平比较", step1Text: "四个视频共享同一场景与相机轨迹；不要根据编号猜测视频来源。",
         step2Title: "2. 每项恰选两个", step2Text: "依次评价四项指标。不同指标可以选择不同的视频。",
         step3Title: "3. 可同步重播", step3Text: "视频静音、自动循环播放。可使用同步重播按钮对齐起点。",
         step4Title: "4. 下载并发送结果", step4Text: "完成后下载 JSON 文件，并将该文件发送给研究人员。",
@@ -708,7 +708,7 @@
         introEyebrow: "Anonymous video comparison",
         introTitle: "Choose the two better videos in each group",
         introLede: "This study contains 15 groups. Each group shows four anonymous videos generated from the same input. Watch the looping videos and choose the best two separately for each of four criteria.",
-        step1Title: "1. Compare within each group", step1Text: "All four videos share the same scene and camera trajectory. Do not infer methods from labels.",
+        step1Title: "1. Compare within each group", step1Text: "All four videos share the same scene and camera trajectory. Do not infer their sources from labels.",
         step2Title: "2. Choose exactly two", step2Text: "Evaluate all four criteria in order. Your choices may differ by criterion.",
         step3Title: "3. Replay in sync", step3Text: "Videos are muted and loop automatically. Use synchronized replay to align their starting points.",
         step4Title: "4. Download and send", step4Text: "Download the JSON file after completion and send it to the researcher.",
@@ -763,7 +763,7 @@
       const videoOrders = {};
       const answers = {};
       for (const caseId of taskOrder) {
-        videoOrders[caseId] = shuffle(METHODS);
+        videoOrders[caseId] = shuffle(CANDIDATES);
         answers[caseId] = {};
         for (const metric of METRICS) answers[caseId][metric.id] = [];
       }
@@ -863,12 +863,12 @@
       $("errorMessage").textContent = "";
       $("playPauseButton").textContent = t(allPlaying ? "pause" : "play");
 
-      $("videoGrid").innerHTML = order.map((method, index) => {
+      $("videoGrid").innerHTML = order.map((candidateId, index) => {
         const label = String.fromCharCode(65 + index);
-        const isSelected = selections.includes(method);
-        const source = `${encodeURIComponent(method)}/${encodeURIComponent(caseId)}.mp4`;
+        const isSelected = selections.includes(candidateId);
+        const source = `${encodeURIComponent(candidateId)}/${encodeURIComponent(caseId)}.mp4`;
         return `
-          <article class="video-card ${isSelected ? "selected" : ""}" data-method="${method}">
+          <article class="video-card ${isSelected ? "selected" : ""}" data-candidate="${candidateId}">
             <div class="video-wrap">
               <video src="${source}" autoplay loop muted playsinline preload="auto"
                 aria-label="Video ${label}" disablepictureinpicture></video>
@@ -876,7 +876,7 @@
             </div>
             <div class="select-row">
               <label class="video-choice">
-                <input type="checkbox" ${isSelected ? "checked" : ""} data-method="${method}">
+                <input type="checkbox" ${isSelected ? "checked" : ""} data-candidate="${candidateId}">
                 <span>${isSelected ? t("chosen") : t("choose")} ${label}</span>
               </label>
             </div>
@@ -884,7 +884,7 @@
       }).join("");
 
       $("videoGrid").querySelectorAll("input[type=checkbox]").forEach(input => {
-        input.addEventListener("change", () => toggleSelection(input.dataset.method, input));
+        input.addEventListener("change", () => toggleSelection(input.dataset.candidate, input));
       });
 
       $("metricTabs").innerHTML = METRICS.map((item, index) => {
@@ -919,13 +919,13 @@
       });
     }
 
-    function toggleSelection(method, input) {
+    function toggleSelection(candidateId, input) {
       const selected = currentSelections();
-      const existingIndex = selected.indexOf(method);
+      const existingIndex = selected.indexOf(candidateId);
       if (existingIndex >= 0) {
         selected.splice(existingIndex, 1);
       } else if (selected.length < 2) {
-        selected.push(method);
+        selected.push(candidateId);
       } else {
         input.checked = false;
         $("errorMessage").textContent = t("incompleteMetric");
@@ -995,24 +995,24 @@
     function buildExport() {
       const responses = state.taskOrder.map((caseId, randomizedTaskIndex) => {
         const displayOrder = state.videoOrders[caseId];
-        const labelsByMethod = Object.fromEntries(displayOrder.map((method, index) => [
-          method, String.fromCharCode(65 + index)
+        const labelsByCandidate = Object.fromEntries(displayOrder.map((candidateId, index) => [
+          candidateId, String.fromCharCode(65 + index)
         ]));
         const ratings = {};
         for (const metric of METRICS) {
-          const selectedMethods = state.answers[caseId][metric.id];
+          const selectedCandidateIds = state.answers[caseId][metric.id];
           ratings[metric.id] = {
-            selectedLabels: selectedMethods.map(method => labelsByMethod[method]).sort(),
-            selectedMethods
+            selectedLabels: selectedCandidateIds.map(candidateId => labelsByCandidate[candidateId]).sort(),
+            selectedCandidateIds
           };
         }
         return {
           randomizedTaskIndex: randomizedTaskIndex + 1,
           caseId,
           trajectory: caseId.replace(/^DL_\\d+_\\d+_/, ""),
-          displayOrder: displayOrder.map((method, index) => ({
+          displayOrder: displayOrder.map((candidateId, index) => ({
             label: String.fromCharCode(65 + index),
-            method
+            candidateId
           })),
           ratings
         };
@@ -1022,7 +1022,7 @@
         schemaVersion: state.schemaVersion,
         studyDesign: {
           numberOfCases: CASES.length,
-          videosPerCase: METHODS.length,
+          videosPerCase: CANDIDATES.length,
           selectionsPerMetric: 2,
           metrics: METRICS.map(metric => ({
             id: metric.id,
@@ -1058,7 +1058,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `worldprism_user_study_${safeFilenamePart(state.participantId)}_${state.sessionId.slice(0, 8)}.json`;
+      link.download = `p_survey_${safeFilenamePart(state.participantId)}_${state.sessionId.slice(0, 8)}.json`;
       document.body.appendChild(link);
       link.click();
       link.remove();
