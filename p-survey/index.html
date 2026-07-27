@@ -465,6 +465,45 @@
       line-height: 1.6;
     }
 
+    .motion-guide {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 12px;
+      padding: 14px 16px;
+      border: 1px solid #b9d7d1;
+      border-radius: 12px;
+      color: var(--accent-dark);
+      background: var(--accent-soft);
+    }
+
+    .motion-guide[hidden] { display: none; }
+
+    .motion-symbol {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      min-width: 48px;
+      height: 38px;
+      padding: 0 9px;
+      border-radius: 9px;
+      color: white;
+      background: var(--accent);
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .motion-guide strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: .91rem;
+    }
+
+    .motion-guide span:last-child {
+      font-size: .87rem;
+      line-height: 1.5;
+    }
+
     .task-footer {
       display: flex;
       align-items: center;
@@ -639,6 +678,7 @@
         </div>
         <div id="metricTabs" class="metric-tabs"></div>
         <p id="metricHelp" class="metric-help"></p>
+        <div id="motionGuide" class="motion-guide" hidden></div>
       </section>
 
       <div class="task-footer">
@@ -722,6 +762,30 @@
         helpEn: "Select the two videos with the best overall appearance, considering sharpness, realism, texture detail, color, and visible generation artifacts."
       }
     ];
+
+    const CAMERA_ACTIONS = {
+      forward_backward: {
+        symbol: "↕",
+        zhTitle: "目标动作：先前进，再后退",
+        zhText: "相机应沿当前观察方向向前移动，随后沿近似原路径向后移动。",
+        enTitle: "Target motion: forward, then backward",
+        enText: "The camera should move forward along the viewing direction, then move backward along approximately the same path."
+      },
+      orbit_left: {
+        symbol: "↺",
+        zhTitle: "目标动作：向左环绕",
+        zhText: "相机应围绕场景或主要目标向左侧连续环绕，同时保持合理的观察方向。",
+        enTitle: "Target motion: orbit left",
+        enText: "The camera should continuously orbit to the left around the scene or main subject while maintaining a plausible viewing direction."
+      },
+      u_turn: {
+        symbol: "⤴",
+        zhTitle: "目标动作：U 型掉头",
+        zhText: "相机应沿 U 型轨迹连续转向并完成掉头，而不是保持静止或仅原地旋转。",
+        enTitle: "Target motion: U-turn",
+        enText: "The camera should follow a continuous U-shaped turning path and reverse direction, rather than staying still or only rotating in place."
+      }
+    };
 
     const I18N = {
       zh: {
@@ -955,6 +1019,21 @@
         </div>`;
 
       $("metricHelp").textContent = language === "zh" ? metric.helpZh : metric.helpEn;
+      const motionGuide = $("motionGuide");
+      if (metric.id === "camera_motion_alignment") {
+        const trajectory = caseId.replace(/^DL_\d+_\d+_/, "");
+        const action = CAMERA_ACTIONS[trajectory];
+        motionGuide.hidden = false;
+        motionGuide.innerHTML = `
+          <span class="motion-symbol" aria-hidden="true">${action.symbol}</span>
+          <span>
+            <strong>${language === "zh" ? action.zhTitle : action.enTitle}</strong>
+            <span>${language === "zh" ? action.zhText : action.enText}</span>
+          </span>`;
+      } else {
+        motionGuide.hidden = true;
+        motionGuide.innerHTML = "";
+      }
       $("selectionStatus").textContent = `${t("selected")} ${selections.length} / 2`;
 
       requestAnimationFrame(() => {
