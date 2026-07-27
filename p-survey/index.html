@@ -698,6 +698,7 @@
       <div class="finish-actions">
         <button id="downloadButton" class="primary" type="button" data-i18n="download">下载 JSON 结果</button>
         <button id="reviewButton" class="secondary" type="button" data-i18n="review">返回检查</button>
+        <button id="restartButton" class="secondary" type="button" data-i18n="restart">重做一份</button>
       </div>
       <p class="privacy-note" data-i18n="privacy">数据只会在你点击下载时保存到本机；本网页不会上传任何内容。</p>
     </section>
@@ -804,7 +805,8 @@
         previous: "上一组", next: "下一组", finish: "完成实验",
         completeEyebrow: "评价完成", completeTitle: "谢谢参与",
         completeText: "请下载 JSON 结果文件，并将它发送给研究人员。文件中包含匿名选择及本次随机排列的映射。",
-        download: "下载 JSON 结果", review: "返回检查",
+        download: "下载 JSON 结果", review: "返回检查", restart: "重做一份",
+        restartConfirm: "请确认已经下载当前 JSON 结果。重新开始后，本次浏览器草稿将被清空。是否继续？",
         privacy: "数据只会在你点击下载时保存到本机；本网页不会上传任何内容。",
         scene: "场景", sceneSubtitle: "请观察完整循环，再根据下方当前指标选择两个视频。",
         task: "场景", selected: "已选", choose: "选择视频",
@@ -829,7 +831,8 @@
         previous: "Previous", next: "Next", finish: "Finish study",
         completeEyebrow: "Evaluation complete", completeTitle: "Thank you",
         completeText: "Download the JSON result and send it to the researcher. It contains your anonymous choices and the randomization mapping for this session.",
-        download: "Download JSON result", review: "Review answers",
+        download: "Download JSON result", review: "Review answers", restart: "Start a new response",
+        restartConfirm: "Make sure you have downloaded the current JSON result. Starting again will clear this browser draft. Continue?",
         privacy: "Data is saved to your computer only when you click download. This page does not upload anything.",
         scene: "Scene", sceneSubtitle: "Watch a complete loop, then choose two videos for the current criterion below.",
         task: "Scene", selected: "Selected", choose: "Select video",
@@ -1198,6 +1201,21 @@
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
+    function restartStudy() {
+      if (!window.confirm(t("restartConfirm"))) return;
+      const previousParticipantId = state?.participantId || "";
+      localStorage.removeItem(STORAGE_KEY);
+      state = null;
+      currentTaskIndex = 0;
+      currentMetricIndex = 0;
+      allPlaying = true;
+      $("study").style.display = "none";
+      $("finish").style.display = "none";
+      $("intro").style.display = "block";
+      $("participantId").value = previousParticipantId;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     function showTransientMessage(message) {
       clearTimeout(transientMessageTimer);
       $("errorMessage").textContent = message;
@@ -1223,6 +1241,7 @@
     $("previousButton").addEventListener("click", () => navigateTask(-1));
     $("nextButton").addEventListener("click", () => navigateTask(1));
     $("downloadButton").addEventListener("click", downloadResult);
+    $("restartButton").addEventListener("click", restartStudy);
     $("reviewButton").addEventListener("click", () => {
       currentTaskIndex = state.taskOrder.length - 1;
       currentMetricIndex = 0;
