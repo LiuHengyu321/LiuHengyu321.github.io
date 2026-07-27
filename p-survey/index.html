@@ -272,6 +272,40 @@
       margin-bottom: 18px;
     }
 
+    .video-grid.mosaic-mode {
+      display: block;
+      width: min(100%, 1120px);
+      margin: 0 auto 18px;
+    }
+
+    .mosaic-player {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      border-radius: 16px;
+      background: #0e1113;
+      box-shadow: 0 12px 34px rgba(19, 25, 29, .2);
+    }
+
+    .mosaic-player video {
+      object-fit: contain;
+    }
+
+    .mosaic-label-b { left: calc(50% + 10px); }
+    .mosaic-label-c { top: calc(50% + 10px); }
+    .mosaic-label-d { top: calc(50% + 10px); left: calc(50% + 10px); }
+
+    .mosaic-choice-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .mosaic-choice-grid .video-card {
+      background: #fff;
+    }
+
     .video-card {
       overflow: hidden;
       border: 2px solid transparent;
@@ -495,7 +529,7 @@
     }
 
     @media (max-width: 1060px) {
-      .video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .video-grid:not(.mosaic-mode) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .metric-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
@@ -510,6 +544,7 @@
       .task-head { align-items: flex-start; flex-direction: column; }
       .sync-controls { justify-content: flex-start; }
       .video-grid { gap: 8px; }
+      .mosaic-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .video-label { width: 29px; height: 29px; font-size: .8rem; }
       .select-row { padding: 7px; }
       .video-choice { min-height: 36px; font-size: .77rem; }
@@ -594,7 +629,7 @@
         </div>
       </div>
 
-      <div id="videoGrid" class="video-grid"></div>
+      <div id="videoGrid" class="video-grid mosaic-mode"></div>
 
       <section class="questions panel">
         <div class="questions-title">
@@ -630,8 +665,8 @@
   <script>
     "use strict";
 
-    const STUDY_VERSION = "p-survey-v1.2";
-    const STORAGE_KEY = "p_survey_draft_v2";
+    const STUDY_VERSION = "p-survey-v1.3";
+    const STORAGE_KEY = "p_survey_draft_v3";
     const CANDIDATES = ["candidate-a", "candidate-b", "candidate-c", "candidate-d"];
     const CASES = [
       "DL_058_4_forward_backward",
@@ -650,6 +685,11 @@
       "DL_294_12_u_turn",
       "DL_206_12_u_turn"
     ];
+    const MOSAIC_ROTATIONS = [2, 0, 3, 1, 1, 3, 0, 2, 3, 1, 2, 0, 0, 2, 1];
+    const MOSAIC_ORDERS = Object.fromEntries(CASES.map((caseId, caseIndex) => {
+      const rotation = MOSAIC_ROTATIONS[caseIndex];
+      return [caseId, CANDIDATES.map((_, index) => CANDIDATES[(rotation + index) % CANDIDATES.length])];
+    }));
 
     const METRICS = [
       {
@@ -773,7 +813,7 @@
       const metricAssignments = {};
       const answers = {};
       for (const [index, caseId] of taskOrder.entries()) {
-        videoOrders[caseId] = shuffle(CANDIDATES);
+        videoOrders[caseId] = [...MOSAIC_ORDERS[caseId]];
         metricAssignments[caseId] = metricPool[index];
         answers[caseId] = [];
       }
@@ -875,17 +915,12 @@
       $("errorMessage").textContent = "";
       $("playPauseButton").textContent = t(allPlaying ? "pause" : "play");
 
-      $("videoGrid").innerHTML = order.map((candidateId, index) => {
+      const choices = order.map((candidateId, index) => {
         const label = String.fromCharCode(65 + index);
         const isSelected = selections.includes(candidateId);
-        const source = `${encodeURIComponent(candidateId)}/${encodeURIComponent(caseId)}.mp4`;
         return `
-          <article class="video-card ${isSelected ? "selected" : ""}" data-candidate="${candidateId}">
-            <div class="video-wrap">
-              <video src="${source}" autoplay loop muted playsinline preload="metadata"
-                aria-label="Video ${label}" disablepictureinpicture></video>
-              <span class="video-label">${label}</span>
-            </div>
+          <article class="video-card ${isSelected ? "selected" : ""}"
+            data-candidate="${candidateId}" data-label="${label}">
             <div class="select-row">
               <label class="video-choice">
                 <input type="checkbox" ${isSelected ? "checked" : ""} data-candidate="${candidateId}">
@@ -894,6 +929,18 @@
             </div>
           </article>`;
       }).join("");
+
+      $("videoGrid").innerHTML = `
+        <div class="mosaic-player">
+          <video src="mosaic/${encodeURIComponent(caseId)}.mp4" autoplay loop muted playsinline
+            preload="metadata" aria-label="Four synchronized comparison videos"
+            disablepictureinpicture></video>
+          <span class="video-label mosaic-label-a">A</span>
+          <span class="video-label mosaic-label-b">B</span>
+          <span class="video-label mosaic-label-c">C</span>
+          <span class="video-label mosaic-label-d">D</span>
+        </div>
+        <div class="mosaic-choice-grid">${choices}</div>`;
 
       $("videoGrid").querySelectorAll("input[type=checkbox]").forEach(input => {
         input.addEventListener("change", () => toggleSelection(input.dataset.candidate, input));
@@ -944,7 +991,7 @@
         const candidateId = card.dataset.candidate;
         const isSelected = selected.includes(candidateId);
         const input = card.querySelector("input[type=checkbox]");
-        const label = card.querySelector(".video-label").textContent;
+        const label = card.dataset.label;
         card.classList.toggle("selected", isSelected);
         input.checked = isSelected;
         card.querySelector(".video-choice span").textContent =
@@ -1034,7 +1081,8 @@
             labelEn: metric.en
           })),
           metricAssignment: "one metric per case, balanced 4/4/4/3 with the three-count metric randomized per participant",
-          randomization: "metric assignment, case order, and within-case video display order randomized per participant"
+          displayOrder: "case-specific counterbalanced candidate positions in a single synchronized mosaic",
+          randomization: "metric assignment and case order randomized per participant"
         },
         participant: {
           id: state.participantId || null,
