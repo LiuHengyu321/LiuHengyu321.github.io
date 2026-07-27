@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>World Model Video User Study</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #64717e;
+      --paper: #f4f1e9;
+      --card: #fffdf8;
+      --line: #d8d2c5;
+      --accent: #176c66;
+      --accent-dark: #10534e;
+      --accent-soft: #dceee9;
+      --danger: #a33a33;
+      --shadow: 0 16px 45px rgba(37, 44, 49, .1);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 0 0, rgba(23, 108, 102, .11), transparent 32rem),
+        linear-gradient(180deg, #f8f6f0 0, var(--paper) 100%);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    button, input { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    .video-choice:focus-within {
+      outline: 3px solid rgba(23, 108, 102, .28);
+      outline-offset: 3px;
+    }
+
+    .shell {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--accent);
+      box-shadow: 0 8px 18px rgba(23, 108, 102, .22);
+    }
+
+    .lang-button {
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 253, 248, .7);
+    }
+
+    .panel {
+      border: 1px solid rgba(216, 210, 197, .9);
+      border-radius: var(--radius);
+      background: rgba(255, 253, 248, .92);
+      box-shadow: var(--shadow);
+    }
+
+    .intro {
+      max-width: 840px;
+      margin: 5vh auto 0;
+      padding: clamp(28px, 5vw, 56px);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.35rem);
+      line-height: .99;
+      letter-spacing: -.055em;
+      max-width: 760px;
+    }
+
+    .lede {
+      margin: 22px 0 28px;
+      max-width: 680px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.16rem);
+      line-height: 1.7;
+    }
+
+    .instruction-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 30px;
+    }
+
+    .instruction {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .instruction strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: .92rem;
+    }
+
+    .instruction span {
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.5;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      font-weight: 750;
+      font-size: .92rem;
+    }
+
+    .field input {
+      width: min(100%, 420px);
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--ink);
+      background: white;
+    }
+
+    .primary {
+      min-height: 48px;
+      padding: 0 21px;
+      border-radius: 12px;
+      color: white;
+      background: var(--accent);
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(23, 108, 102, .2);
+    }
+
+    .primary:hover { background: var(--accent-dark); }
+    .primary:disabled { opacity: .48; cursor: not-allowed; box-shadow: none; }
+
+    .secondary {
+      min-height: 44px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 700;
+    }
+
+    .study { display: none; }
+
+    .study-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: 0 -10px 20px;
+      padding: 12px 10px;
+      background: rgba(244, 241, 233, .9);
+      backdrop-filter: blur(14px);
+    }
+
+    .study-header-inner {
+      display: grid;
+      grid-template-columns: 1fr minmax(180px, 420px) auto;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .task-count {
+      font-size: .88rem;
+      font-weight: 800;
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dcd7cc;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      transition: width .28s ease;
+    }
+
+    .header-actions { display: flex; gap: 8px; }
+
+    .task-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-end;
+      margin: 8px 0 16px;
+    }
+
+    .task-head h2 {
+      margin: 0 0 5px;
+      font-size: clamp(1.55rem, 3vw, 2.35rem);
+      letter-spacing: -.035em;
+    }
+
+    .task-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .sync-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .video-card {
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 15px;
+      background: #15191c;
+      box-shadow: 0 9px 26px rgba(19, 25, 29, .15);
+      transition: border-color .18s, transform .18s;
+    }
+
+    .video-card.selected {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .video-wrap {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background: #0e1113;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #0e1113;
+    }
+
+    .video-label {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      color: #10201e;
+      background: rgba(255, 255, 255, .9);
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .22);
+      pointer-events: none;
+    }
+
+    .select-row {
+      padding: 10px;
+      background: #fff;
+    }
+
+    .video-choice {
+      width: 100%;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 9px;
+      color: var(--ink);
+      background: #f1eee7;
+      font-size: .86rem;
+      font-weight: 800;
+      transition: color .18s, background .18s;
+    }
+
+    .video-card.selected .video-choice {
+      color: var(--accent-dark);
+      background: var(--accent-soft);
+    }
+
+    .video-choice input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .questions {
+      padding: 20px;
+    }
+
+    .questions-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .questions-title h3 { margin: 0; font-size: 1.05rem; }
+
+    .selection-status {
+      color: var(--muted);
+      font-size: .84rem;
+      font-weight: 750;
+    }
+
+    .metric-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric-tab {
+      position: relative;
+      min-height: 92px;
+      padding: 13px;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .metric-tab.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .metric-tab.done::after {
+      content: "✓";
+      position: absolute;
+      top: 9px;
+      right: 10px;
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .metric-index {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: .7rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .metric-name {
+      display: block;
+      padding-right: 14px;
+      font-size: .86rem;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .metric-help {
+      margin: 15px 0 0;
+      padding: 13px 15px;
+      border-left: 3px solid var(--accent);
+      color: var(--muted);
+      background: #f7f5ef;
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+
+    .task-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .error {
+      min-height: 22px;
+      margin: 0;
+      color: var(--danger);
+      font-size: .88rem;
+      font-weight: 700;
+    }
+
+    .nav-actions { display: flex; gap: 8px; }
+
+    .finish {
+      display: none;
+      max-width: 760px;
+      margin: 7vh auto 0;
+      padding: clamp(30px, 6vw, 60px);
+      text-align: center;
+    }
+
+    .finish-icon {
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      color: white;
+      background: var(--accent);
+      font-size: 1.7rem;
+      font-weight: 900;
+    }
+
+    .finish h2 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: -.05em;
+    }
+
+    .finish p {
+      max-width: 560px;
+      margin: 16px auto 26px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .finish-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .privacy-note {
+      margin-top: 16px !important;
+      font-size: .82rem;
+    }
+
+    @media (max-width: 1060px) {
+      .video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 700px) {
+      .shell { width: min(100% - 20px, 1480px); padding-top: 16px; }
+      .topbar { margin-bottom: 14px; }
+      .intro { margin-top: 2vh; padding: 25px 19px; }
+      .instruction-grid { grid-template-columns: 1fr; }
+      .study-header-inner { grid-template-columns: 1fr auto; }
+      .progress-track { grid-column: 1 / -1; grid-row: 2; }
+      .header-actions .secondary:first-child { display: none; }
+      .task-head { align-items: flex-start; flex-direction: column; }
+      .sync-controls { justify-content: flex-start; }
+      .video-grid { gap: 8px; }
+      .video-label { width: 29px; height: 29px; font-size: .8rem; }
+      .select-row { padding: 7px; }
+      .video-choice { min-height: 36px; font-size: .77rem; }
+      .questions { padding: 15px; }
+      .metric-tabs { grid-template-columns: 1fr; }
+      .metric-tab { min-height: 66px; }
+      .task-footer { align-items: stretch; flex-direction: column; }
+      .nav-actions { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">WP</div>
+        <span>Video Evaluation Study</span>
+      </div>
+      <button id="langButton" class="lang-button" type="button" aria-label="Switch language">EN / 中文</button>
+    </header>
+
+    <section id="intro" class="intro panel">
+      <p class="eyebrow" data-i18n="introEyebrow">匿名视频对比实验</p>
+      <h1 data-i18n="introTitle">选出每组中表现更好的两个视频</h1>
+      <p class="lede" data-i18n="introLede">
+        本实验共 15 组，每组包含由同一输入生成的 4 个匿名视频。请完整观看循环播放的视频，并按四项指标分别选出表现最好的两个。
+      </p>
+
+      <div class="instruction-grid">
+        <div class="instruction">
+          <strong data-i18n="step1Title">1. 同组公平比较</strong>
+          <span data-i18n="step1Text">四个视频共享同一场景与相机轨迹；不要根据编号猜测方法。</span>
+        </div>
+        <div class="instruction">
+          <strong data-i18n="step2Title">2. 每项恰选两个</strong>
+          <span data-i18n="step2Text">依次评价四项指标。不同指标可以选择不同的视频。</span>
+        </div>
+        <div class="instruction">
+          <strong data-i18n="step3Title">3. 可同步重播</strong>
+          <span data-i18n="step3Text">视频静音、自动循环播放。可使用同步重播按钮对齐起点。</span>
+        </div>
+        <div class="instruction">
+          <strong data-i18n="step4Title">4. 下载并发送结果</strong>
+          <span data-i18n="step4Text">完成后下载 JSON 文件，并将该文件发送给研究人员。</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="participantId" data-i18n="participantLabel">参与者编号（由研究人员提供；没有可留空）</label>
+        <input id="participantId" autocomplete="off" maxlength="80" placeholder="例如：P001">
+      </div>
+      <button id="startButton" class="primary" type="button" data-i18n="start">开始实验</button>
+    </section>
+
+    <section id="study" class="study" aria-live="polite">
+      <div class="study-header">
+        <div class="study-header-inner">
+          <div id="taskCount" class="task-count">场景 1 / 15</div>
+          <div class="progress-track" aria-label="Study progress">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+          <div class="header-actions">
+            <button id="saveDraftButton" class="secondary" type="button" data-i18n="saveDraft">保存草稿</button>
+            <button id="exitButton" class="secondary" type="button" data-i18n="instructions">说明</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="task-head">
+        <div>
+          <p class="eyebrow" data-i18n="compareEyebrow">同一输入 · 匿名排列</p>
+          <h2 id="sceneTitle">场景 01</h2>
+          <p id="sceneSubtitle">请观察完整循环，再根据下方当前指标选择两个视频。</p>
+        </div>
+        <div class="sync-controls">
+          <button id="replayButton" class="secondary" type="button" data-i18n="replay">↺ 同步重播</button>
+          <button id="playPauseButton" class="secondary" type="button" data-i18n="pause">暂停全部</button>
+        </div>
+      </div>
+
+      <div id="videoGrid" class="video-grid"></div>
+
+      <section class="questions panel">
+        <div class="questions-title">
+          <h3 data-i18n="metricPrompt">当前指标：请选择两个视频</h3>
+          <span id="selectionStatus" class="selection-status">已选 0 / 2</span>
+        </div>
+        <div id="metricTabs" class="metric-tabs"></div>
+        <p id="metricHelp" class="metric-help"></p>
+      </section>
+
+      <div class="task-footer">
+        <p id="errorMessage" class="error" role="alert"></p>
+        <div class="nav-actions">
+          <button id="previousButton" class="secondary" type="button" data-i18n="previous">上一组</button>
+          <button id="nextButton" class="primary" type="button" data-i18n="next">下一组</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="finish" class="finish panel">
+      <div class="finish-icon" aria-hidden="true">✓</div>
+      <p class="eyebrow" data-i18n="completeEyebrow">评价完成</p>
+      <h2 data-i18n="completeTitle">谢谢参与</h2>
+      <p data-i18n="completeText">请下载 JSON 结果文件，并将它发送给研究人员。文件中包含匿名选择及本次随机排列的映射。</p>
+      <div class="finish-actions">
+        <button id="downloadButton" class="primary" type="button" data-i18n="download">下载 JSON 结果</button>
+        <button id="reviewButton" class="secondary" type="button" data-i18n="review">返回检查</button>
+      </div>
+      <p class="privacy-note" data-i18n="privacy">数据只会在你点击下载时保存到本机；本网页不会上传任何内容。</p>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const STUDY_VERSION = "worldprism-user-study-v1.0";
+    const STORAGE_KEY = "worldprism_user_study_draft_v1";
+    const METHODS = ["ours", "DiffusionAsShader", "worldcompass", "WorldPlay"];
+    const CASES = [
+      "DL_058_4_forward_backward",
+      "DL_026_4_forward_backward",
+      "DL_098_4_forward_backward",
+      "DL_186_4_forward_backward",
+      "DL_226_4_forward_backward",
+      "DL_197_10_orbit_left",
+      "DL_085_10_orbit_left",
+      "DL_237_10_orbit_left",
+      "DL_125_10_orbit_left",
+      "DL_141_10_orbit_left",
+      "DL_134_12_u_turn",
+      "DL_102_12_u_turn",
+      "DL_150_12_u_turn",
+      "DL_294_12_u_turn",
+      "DL_206_12_u_turn"
+    ];
+
+    const METRICS = [
+      {
+        id: "geometric_consistency",
+        zh: "3D 结构一致性",
+        en: "3D structural consistency",
+        helpZh: "选择在相机运动中最能保持场景结构、物体形状、空间关系与透视合理性的两个视频。重点留意弯曲、漂移、消失或突然变形。",
+        helpEn: "Select the two videos that best preserve scene structure, object shape, spatial relationships, and plausible perspective during camera motion. Watch for warping, drift, disappearance, or sudden deformation."
+      },
+      {
+        id: "temporal_stability",
+        zh: "跨帧时间稳定性",
+        en: "Temporal stability",
+        helpZh: "选择帧间最连贯稳定的两个视频。重点留意闪烁、抖动、纹理跳变、细节忽隐忽现或运动不连续。",
+        helpEn: "Select the two most coherent and stable videos over time. Watch for flicker, jitter, texture popping, disappearing details, or discontinuous motion."
+      },
+      {
+        id: "camera_motion_alignment",
+        zh: "相机动作符合度",
+        en: "Camera-motion alignment",
+        helpZh: "选择相机运动最自然、最完整、最符合该组预期轨迹的两个视频。不要因为画面近似静止而给高分。",
+        helpEn: "Select the two videos whose camera movement is most natural, complete, and faithful to the intended trajectory. Do not reward a nearly static video."
+      },
+      {
+        id: "visual_quality",
+        zh: "整体视觉质量",
+        en: "Overall visual quality",
+        helpZh: "选择整体观感最好的两个视频，综合考虑清晰度、真实感、纹理细节、色彩与明显的生成伪影。",
+        helpEn: "Select the two videos with the best overall appearance, considering sharpness, realism, texture detail, color, and visible generation artifacts."
+      }
+    ];
+
+    const I18N = {
+      zh: {
+        introEyebrow: "匿名视频对比实验",
+        introTitle: "选出每组中表现更好的两个视频",
+        introLede: "本实验共 15 组，每组包含由同一输入生成的 4 个匿名视频。请完整观看循环播放的视频，并按四项指标分别选出表现最好的两个。",
+        step1Title: "1. 同组公平比较", step1Text: "四个视频共享同一场景与相机轨迹；不要根据编号猜测方法。",
+        step2Title: "2. 每项恰选两个", step2Text: "依次评价四项指标。不同指标可以选择不同的视频。",
+        step3Title: "3. 可同步重播", step3Text: "视频静音、自动循环播放。可使用同步重播按钮对齐起点。",
+        step4Title: "4. 下载并发送结果", step4Text: "完成后下载 JSON 文件，并将该文件发送给研究人员。",
+        participantLabel: "参与者编号（由研究人员提供；没有可留空）",
+        participantPlaceholder: "例如：P001",
+        start: "开始实验", saveDraft: "保存草稿", instructions: "说明",
+        compareEyebrow: "同一输入 · 匿名排列", replay: "↺ 同步重播",
+        pause: "暂停全部", play: "播放全部", metricPrompt: "当前指标：请选择两个视频",
+        previous: "上一组", next: "下一组", finish: "完成实验",
+        completeEyebrow: "评价完成", completeTitle: "谢谢参与",
+        completeText: "请下载 JSON 结果文件，并将它发送给研究人员。文件中包含匿名选择及本次随机排列的映射。",
+        download: "下载 JSON 结果", review: "返回检查",
+        privacy: "数据只会在你点击下载时保存到本机；本网页不会上传任何内容。",
+        scene: "场景", sceneSubtitle: "请观察完整循环，再根据下方当前指标选择两个视频。",
+        task: "场景", selected: "已选", choose: "选择视频",
+        chosen: "已选择", metric: "指标", incompleteMetric: "请先为当前指标恰好选择两个视频。",
+        incompleteTask: "本组仍有指标未完成，请完成四项选择后继续。",
+        draftSaved: "草稿已保存到此浏览器。", resume: "检测到未完成草稿，已自动恢复。",
+        noId: "anonymous", invalidDraft: "草稿无法读取，已开始新的实验。"
+      },
+      en: {
+        introEyebrow: "Anonymous video comparison",
+        introTitle: "Choose the two better videos in each group",
+        introLede: "This study contains 15 groups. Each group shows four anonymous videos generated from the same input. Watch the looping videos and choose the best two separately for each of four criteria.",
+        step1Title: "1. Compare within each group", step1Text: "All four videos share the same scene and camera trajectory. Do not infer methods from labels.",
+        step2Title: "2. Choose exactly two", step2Text: "Evaluate all four criteria in order. Your choices may differ by criterion.",
+        step3Title: "3. Replay in sync", step3Text: "Videos are muted and loop automatically. Use synchronized replay to align their starting points.",
+        step4Title: "4. Download and send", step4Text: "Download the JSON file after completion and send it to the researcher.",
+        participantLabel: "Participant ID (provided by the researcher; optional)",
+        participantPlaceholder: "e.g. P001",
+        start: "Start study", saveDraft: "Save draft", instructions: "Instructions",
+        compareEyebrow: "Same input · anonymous order", replay: "↺ Replay in sync",
+        pause: "Pause all", play: "Play all", metricPrompt: "Current criterion: choose two videos",
+        previous: "Previous", next: "Next", finish: "Finish study",
+        completeEyebrow: "Evaluation complete", completeTitle: "Thank you",
+        completeText: "Download the JSON result and send it to the researcher. It contains your anonymous choices and the randomization mapping for this session.",
+        download: "Download JSON result", review: "Review answers",
+        privacy: "Data is saved to your computer only when you click download. This page does not upload anything.",
+        scene: "Scene", sceneSubtitle: "Watch a complete loop, then choose two videos for the current criterion below.",
+        task: "Scene", selected: "Selected", choose: "Select video",
+        chosen: "Selected", metric: "Criterion", incompleteMetric: "Please choose exactly two videos for the current criterion.",
+        incompleteTask: "Some criteria in this group are incomplete. Complete all four before continuing.",
+        draftSaved: "Draft saved in this browser.", resume: "An unfinished draft was found and restored.",
+        noId: "anonymous", invalidDraft: "The draft could not be read. A new study was started."
+      }
+    };
+
+    let language = "zh";
+    let state = null;
+    let currentTaskIndex = 0;
+    let currentMetricIndex = 0;
+    let allPlaying = true;
+    let transientMessageTimer = null;
+
+    const $ = (id) => document.getElementById(id);
+    const t = (key) => I18N[language][key] || key;
+
+    function randomSeed() {
+      const bytes = new Uint32Array(4);
+      crypto.getRandomValues(bytes);
+      return Array.from(bytes, n => n.toString(16).padStart(8, "0")).join("");
+    }
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const random = new Uint32Array(1);
+        crypto.getRandomValues(random);
+        const j = random[0] % (i + 1);
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function createState(participantId) {
+      const taskOrder = shuffle(CASES);
+      const videoOrders = {};
+      const answers = {};
+      for (const caseId of taskOrder) {
+        videoOrders[caseId] = shuffle(METHODS);
+        answers[caseId] = {};
+        for (const metric of METRICS) answers[caseId][metric.id] = [];
+      }
+      return {
+        schemaVersion: STUDY_VERSION,
+        participantId: participantId.trim(),
+        sessionId: randomSeed(),
+        startedAt: new Date().toISOString(),
+        lastSavedAt: null,
+        completedAt: null,
+        userAgent: navigator.userAgent,
+        language,
+        taskOrder,
+        videoOrders,
+        answers
+      };
+    }
+
+    function saveDraft(showMessage = false) {
+      if (!state) return;
+      state.lastSavedAt = new Date().toISOString();
+      state.language = language;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, currentTaskIndex, currentMetricIndex }));
+      if (showMessage) showTransientMessage(t("draftSaved"));
+    }
+
+    function loadDraft() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      try {
+        const draft = JSON.parse(raw);
+        if (!draft.state || draft.state.schemaVersion !== STUDY_VERSION) return false;
+        state = draft.state;
+        language = state.language === "en" ? "en" : "zh";
+        currentTaskIndex = Math.min(Math.max(Number(draft.currentTaskIndex) || 0, 0), CASES.length - 1);
+        currentMetricIndex = Math.min(Math.max(Number(draft.currentMetricIndex) || 0, 0), METRICS.length - 1);
+        return true;
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+        return false;
+      }
+    }
+
+    function setLanguage(nextLanguage) {
+      language = nextLanguage;
+      document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+      });
+      $("participantId").placeholder = t("participantPlaceholder");
+      if (state) {
+        state.language = language;
+        renderTask();
+        saveDraft();
+      }
+    }
+
+    function showStudy() {
+      $("intro").style.display = "none";
+      $("finish").style.display = "none";
+      $("study").style.display = "block";
+      renderTask();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function startStudy() {
+      if (!state) state = createState($("participantId").value);
+      showStudy();
+      saveDraft();
+    }
+
+    function currentCaseId() {
+      return state.taskOrder[currentTaskIndex];
+    }
+
+    function currentSelections() {
+      return state.answers[currentCaseId()][METRICS[currentMetricIndex].id];
+    }
+
+    function taskComplete(caseId) {
+      return METRICS.every(metric => state.answers[caseId][metric.id].length === 2);
+    }
+
+    function renderTask() {
+      if (!state) return;
+      const caseId = currentCaseId();
+      const order = state.videoOrders[caseId];
+      const metric = METRICS[currentMetricIndex];
+      const selections = currentSelections();
+
+      $("taskCount").textContent = `${t("task")} ${currentTaskIndex + 1} / ${state.taskOrder.length}`;
+      $("progressBar").style.width = `${((currentTaskIndex + 1) / state.taskOrder.length) * 100}%`;
+      $("sceneTitle").textContent = `${t("scene")} ${String(currentTaskIndex + 1).padStart(2, "0")}`;
+      $("sceneSubtitle").textContent = t("sceneSubtitle");
+      $("previousButton").disabled = currentTaskIndex === 0;
+      $("nextButton").textContent = currentTaskIndex === state.taskOrder.length - 1 ? t("finish") : t("next");
+      $("errorMessage").textContent = "";
+      $("playPauseButton").textContent = t(allPlaying ? "pause" : "play");
+
+      $("videoGrid").innerHTML = order.map((method, index) => {
+        const label = String.fromCharCode(65 + index);
+        const isSelected = selections.includes(method);
+        const source = `${encodeURIComponent(method)}/${encodeURIComponent(caseId)}.mp4`;
+        return `
+          <article class="video-card ${isSelected ? "selected" : ""}" data-method="${method}">
+            <div class="video-wrap">
+              <video src="${source}" autoplay loop muted playsinline preload="auto"
+                aria-label="Video ${label}" disablepictureinpicture></video>
+              <span class="video-label">${label}</span>
+            </div>
+            <div class="select-row">
+              <label class="video-choice">
+                <input type="checkbox" ${isSelected ? "checked" : ""} data-method="${method}">
+                <span>${isSelected ? t("chosen") : t("choose")} ${label}</span>
+              </label>
+            </div>
+          </article>`;
+      }).join("");
+
+      $("videoGrid").querySelectorAll("input[type=checkbox]").forEach(input => {
+        input.addEventListener("change", () => toggleSelection(input.dataset.method, input));
+      });
+
+      $("metricTabs").innerHTML = METRICS.map((item, index) => {
+        const done = state.answers[caseId][item.id].length === 2;
+        return `
+          <button class="metric-tab ${index === currentMetricIndex ? "active" : ""} ${done ? "done" : ""}"
+            type="button" data-index="${index}" aria-pressed="${index === currentMetricIndex}">
+            <span class="metric-index">${t("metric")} ${index + 1}</span>
+            <span class="metric-name">${language === "zh" ? item.zh : item.en}</span>
+          </button>`;
+      }).join("");
+
+      $("metricTabs").querySelectorAll(".metric-tab").forEach(button => {
+        button.addEventListener("click", () => {
+          currentMetricIndex = Number(button.dataset.index);
+          renderTask();
+          saveDraft();
+        });
+      });
+
+      $("metricHelp").textContent = language === "zh" ? metric.helpZh : metric.helpEn;
+      $("selectionStatus").textContent = `${t("selected")} ${selections.length} / 2`;
+
+      requestAnimationFrame(() => {
+        const videos = document.querySelectorAll("#videoGrid video");
+        videos.forEach(video => {
+          if (allPlaying) video.play().catch(() => {
+            allPlaying = false;
+            $("playPauseButton").textContent = t("play");
+          });
+        });
+      });
+    }
+
+    function toggleSelection(method, input) {
+      const selected = currentSelections();
+      const existingIndex = selected.indexOf(method);
+      if (existingIndex >= 0) {
+        selected.splice(existingIndex, 1);
+      } else if (selected.length < 2) {
+        selected.push(method);
+      } else {
+        input.checked = false;
+        $("errorMessage").textContent = t("incompleteMetric");
+        return;
+      }
+
+      $("errorMessage").textContent = "";
+      saveDraft();
+      renderTask();
+
+      if (selected.length === 2 && currentMetricIndex < METRICS.length - 1) {
+        window.setTimeout(() => {
+          currentMetricIndex += 1;
+          renderTask();
+          saveDraft();
+        }, 260);
+      }
+    }
+
+    function navigateTask(direction) {
+      const caseId = currentCaseId();
+      if (direction > 0 && !taskComplete(caseId)) {
+        const firstIncomplete = METRICS.findIndex(metric => state.answers[caseId][metric.id].length !== 2);
+        currentMetricIndex = firstIncomplete < 0 ? 0 : firstIncomplete;
+        renderTask();
+        $("errorMessage").textContent = t("incompleteTask");
+        return;
+      }
+
+      if (direction > 0 && currentTaskIndex === state.taskOrder.length - 1) {
+        finishStudy();
+        return;
+      }
+
+      currentTaskIndex = Math.max(0, Math.min(state.taskOrder.length - 1, currentTaskIndex + direction));
+      currentMetricIndex = 0;
+      saveDraft();
+      renderTask();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function replayAll() {
+      document.querySelectorAll("#videoGrid video").forEach(video => {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      });
+      allPlaying = true;
+      $("playPauseButton").textContent = t("pause");
+    }
+
+    function toggleAllPlayback() {
+      const videos = document.querySelectorAll("#videoGrid video");
+      if (allPlaying) videos.forEach(video => video.pause());
+      else videos.forEach(video => video.play().catch(() => {}));
+      allPlaying = !allPlaying;
+      $("playPauseButton").textContent = t(allPlaying ? "pause" : "play");
+    }
+
+    function finishStudy() {
+      state.completedAt = new Date().toISOString();
+      saveDraft();
+      $("study").style.display = "none";
+      $("finish").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function buildExport() {
+      const responses = state.taskOrder.map((caseId, randomizedTaskIndex) => {
+        const displayOrder = state.videoOrders[caseId];
+        const labelsByMethod = Object.fromEntries(displayOrder.map((method, index) => [
+          method, String.fromCharCode(65 + index)
+        ]));
+        const ratings = {};
+        for (const metric of METRICS) {
+          const selectedMethods = state.answers[caseId][metric.id];
+          ratings[metric.id] = {
+            selectedLabels: selectedMethods.map(method => labelsByMethod[method]).sort(),
+            selectedMethods
+          };
+        }
+        return {
+          randomizedTaskIndex: randomizedTaskIndex + 1,
+          caseId,
+          trajectory: caseId.replace(/^DL_\\d+_\\d+_/, ""),
+          displayOrder: displayOrder.map((method, index) => ({
+            label: String.fromCharCode(65 + index),
+            method
+          })),
+          ratings
+        };
+      });
+
+      return {
+        schemaVersion: state.schemaVersion,
+        studyDesign: {
+          numberOfCases: CASES.length,
+          videosPerCase: METHODS.length,
+          selectionsPerMetric: 2,
+          metrics: METRICS.map(metric => ({
+            id: metric.id,
+            labelZh: metric.zh,
+            labelEn: metric.en
+          })),
+          randomization: "case order and within-case video display order randomized per participant"
+        },
+        participant: {
+          id: state.participantId || null,
+          sessionId: state.sessionId
+        },
+        timing: {
+          startedAt: state.startedAt,
+          completedAt: state.completedAt || new Date().toISOString(),
+          exportedAt: new Date().toISOString()
+        },
+        environment: {
+          language: state.language,
+          userAgent: state.userAgent
+        },
+        responses
+      };
+    }
+
+    function safeFilenamePart(value) {
+      return (value || t("noId")).replace(/[^a-zA-Z0-9_-]+/g, "_").slice(0, 60) || "anonymous";
+    }
+
+    function downloadResult() {
+      const result = buildExport();
+      const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `worldprism_user_study_${safeFilenamePart(state.participantId)}_${state.sessionId.slice(0, 8)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function showTransientMessage(message) {
+      clearTimeout(transientMessageTimer);
+      $("errorMessage").textContent = message;
+      $("errorMessage").style.color = "var(--accent)";
+      transientMessageTimer = window.setTimeout(() => {
+        $("errorMessage").textContent = "";
+        $("errorMessage").style.color = "";
+      }, 2400);
+    }
+
+    $("langButton").addEventListener("click", () => setLanguage(language === "zh" ? "en" : "zh"));
+    $("startButton").addEventListener("click", startStudy);
+    $("saveDraftButton").addEventListener("click", () => saveDraft(true));
+    $("exitButton").addEventListener("click", () => {
+      saveDraft();
+      $("study").style.display = "none";
+      $("intro").style.display = "block";
+      $("participantId").value = state.participantId;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    $("replayButton").addEventListener("click", replayAll);
+    $("playPauseButton").addEventListener("click", toggleAllPlayback);
+    $("previousButton").addEventListener("click", () => navigateTask(-1));
+    $("nextButton").addEventListener("click", () => navigateTask(1));
+    $("downloadButton").addEventListener("click", downloadResult);
+    $("reviewButton").addEventListener("click", () => {
+      currentTaskIndex = state.taskOrder.length - 1;
+      currentMetricIndex = 0;
+      showStudy();
+    });
+
+    window.addEventListener("beforeunload", () => saveDraft());
+
+    setLanguage("zh");
+    if (loadDraft()) {
+      setLanguage(language);
+      $("participantId").value = state.participantId;
+      showStudy();
+      showTransientMessage(t("resume"));
+    }
+  </script>
+</body>
+</html>
