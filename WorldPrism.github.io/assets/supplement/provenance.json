@@ -1,0 +1,21 @@
+{
+  "source": "/Users/piang/Documents/Neurips_2026_CR/155_sup",
+  "files": [
+    "demo/DL_048_forward_backward.mp4",
+    "demo/DL_289_u_turn.mp4",
+    "demo/DL_062_turn_lr_left_A.mp4",
+    "demo/DL_116_forward_backward.mp4",
+    "demo/DL_077_u_turn.mp4",
+    "demo/DL_174_turn_lr_left_A.mp4",
+    "demo/DL_240_forward_backward.mp4",
+    "demo/DL_005_u_turn.mp4",
+    "demo/DL_138_turn_lr_left_A.mp4",
+    "demo/Lyra_new006_forward_backward.mp4",
+    "demo/Lyra_new001_u_turn.mp4",
+    "demo/Lyra_new005_turn_lr_left_A.mp4",
+    "demo/DL_019_turn_lr_left_B.mp4",
+    "demo/DL_051_turn_lr_left_B.mp4",
+    "demo/DL_123_turn_lr_left_B.mp4"
+  ],
+  "unmodified_videos": true
+}
